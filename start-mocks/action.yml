@@ -30,6 +30,17 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Pull Imposter engine
+      shell: bash
+      run: |
+        if [ ! -z "${{ inputs.version }}" ]; then
+          echo "Pulling ${{ inputs.engine-type }} engine version ${{ inputs.version }}"
+          imposter engine pull -t ${{ inputs.engine-type }} -v ${{ inputs.version }}
+        else
+          echo "Pulling latest ${{ inputs.engine-type }} engine"
+          imposter engine pull -t ${{ inputs.engine-type }}
+        fi
+
     - name: Start Imposter server
       shell: bash
       run: |
