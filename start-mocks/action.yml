@@ -2,22 +2,14 @@ name: 'Start Imposter Mocks'
 description: 'Starts the Imposter mock server in the background'
 
 inputs:
+  config-dir:
+    description: 'Path to the directory containing the Imposter configuration files'
+    required: false
+    default: './mocks'
   port:
     description: 'Port number for the Imposter server'
     required: false
     default: '8080'
-  config-dir:
-    description: 'Path to the configuration directory'
-    required: false
-    default: './mocks'
-  max-attempts:
-    description: 'Maximum number of attempts to check if the server is ready'
-    required: false
-    default: '30'
-  retry-interval:
-    description: 'Interval in seconds between retry attempts'
-    required: false
-    default: '1'
   version:
     description: 'Version of the Imposter mock engine to use'
     required: false
@@ -26,6 +18,14 @@ inputs:
     description: 'Type of mock engine to use (jvm or docker)'
     required: false
     default: 'docker'
+  max-attempts:
+    description: 'Maximum number of attempts to check if the server is ready'
+    required: false
+    default: '30'
+  retry-interval:
+    description: 'Interval in seconds between retry attempts'
+    required: false
+    default: '1'
 
 runs:
   using: "composite"

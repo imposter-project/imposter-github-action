@@ -5,22 +5,22 @@ This repository contains official GitHub Actions for [Imposter](https://www.impo
 ## Available Actions
 
 ### 1. Setup Imposter (`setup`)
-Downloads and installs the Imposter CLI tool.
+Downloads and installs the Imposter mock server.
 
 ```yaml
 - uses: imposter-project/imposter-github-action/setup@v1
 ```
 
 ### 2. Start Mocks (`start-mocks`)
-Starts the Imposter mock server in the background.
+Starts the Imposter mock server in the background, and waits for it to be ready.
 
 ```yaml
 - uses: imposter-project/imposter-github-action/start-mocks@v1
   with:
+    # Optional: Path to the directory containing the Imposter configuration files
+    config-dir: './mocks'      # default: './mocks'
     # Optional: Port number for the Imposter server
-    port: '8080'                # default: '8080'
-    # Optional: Path to the configuration directory
-    config-dir: './mocks'       # default: './mocks'
+    port: '8080'               # default: '8080'
     # Optional: Version of the Imposter mock engine to use
     version: '1.2.3'           # default: '' (latest)
     # Optional: Type of mock engine to use (jvm or docker)
