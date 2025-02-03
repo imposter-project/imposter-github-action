@@ -1,0 +1,72 @@
+name: Test Actions
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test Setup Action
+        uses: ./setup
+        
+      - name: Verify Imposter Installation
+        run: |
+          imposter --version
+          # Add more verification steps as needed
+
+  test-mock-lifecycle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Imposter
+        uses: ./setup
+        
+      # Create a test mock configuration
+      - name: Create Test Mock Config
+        run: |
+          mkdir -p mocks
+          cat > mocks/config.json << EOF
+          {
+            "plugin": "rest",
+            "resources": [
+              {
+                "path": "/test",
+                "response": {
+                  "statusCode": 200,
+                  "content": "Hello from Imposter"
+                }
+              }
+            ]
+          }
+          EOF
+      
+      - name: Test Start Mocks Action
+        uses: ./start-mocks
+        
+      - name: Verify Mock Server
+        run: |
+          # Wait for server to start
+          sleep 5
+          # Test the mock endpoint
+          response=$(curl -s http://localhost:8080/test)
+          if [ "$response" != "Hello from Imposter" ]; then
+            echo "Mock server test failed"
+            exit 1
+          fi
+      
+      - name: Test Stop Mocks Action
+        uses: ./stop-mocks
+        
+      - name: Verify Server Stopped
+        run: |
+          if curl -s http://localhost:8080/test; then
+            echo "Mock server is still running"
+            exit 1
+          fi 
