@@ -77,8 +77,6 @@ jobs:
         config-dir: './mocks'
         engine-type: 'docker'
         version: '1.2.3'        # Optional: specify engine version
-        max-attempts: '30'      # Optional: configure startup retry behaviour
-        retry-interval: '1'     # Optional: configure startup retry behaviour
     
     # Your test steps here
     - name: Run Tests
@@ -95,7 +93,7 @@ jobs:
 
 ## Configuration
 
-The mock server configuration should be placed in your repository according to the `config-dir` parameter (defaults to `./mocks`). For detailed information about configuring Imposter mocks, please visit the [official documentation](https://www.imposter.sh).
+The mock server configuration should be placed in your repository according to the `config-dir` parameter (defaults to `./mocks`). For detailed information about configuring Imposter mocks, please visit the [official documentation](https://docs.imposter.sh/configuration/).
 
 ## Contributing
 
