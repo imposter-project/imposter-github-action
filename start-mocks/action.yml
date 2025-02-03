@@ -10,6 +10,14 @@ inputs:
     description: 'Path to the configuration directory'
     required: false
     default: './mocks'
+  max-attempts:
+    description: 'Maximum number of attempts to check if the server is ready'
+    required: false
+    default: '30'
+  retry-interval:
+    description: 'Interval in seconds between retry attempts'
+    required: false
+    default: '1'
 
 runs:
   using: "composite"
@@ -20,15 +28,17 @@ runs:
         imposter up -p ${{ inputs.port }} "${{ inputs.config-dir }}" &
         
         # Wait for server to be ready
-        max_attempts=30
+        max_attempts=${{ inputs.max-attempts }}
         attempt=1
-        until curl -s -o /dev/null -w "%{http_code}" "http://localhost:${{ inputs.port }}/system/status" | grep -q "200"; do
+        health_check_url="http://localhost:${{ inputs.port }}/system/status"
+        echo "Waiting for Imposter server to start at: $health_check_url"
+        until curl -s -o /dev/null -w "%{http_code}" "$health_check_url" | grep -q "200"; do
           if [ $attempt -ge $max_attempts ]; then
             echo "Timeout waiting for Imposter server to start"
             exit 1
           fi
           echo "Waiting for Imposter server to start (attempt $attempt/$max_attempts)..."
-          sleep 1
+          sleep ${{ inputs.retry-interval }}
           attempt=$((attempt + 1))
         done
         echo "Imposter server is ready" 
