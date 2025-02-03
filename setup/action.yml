@@ -1,0 +1,11 @@
+name: 'Setup Imposter'
+description: 'Downloads and installs the Imposter CLI tool'
+runs:
+  using: "composite"
+  steps:
+    - name: Download and execute install script
+      shell: bash
+      run: |
+        curl -s https://raw.githubusercontent.com/imposter-project/imposter-cli/main/install/install_imposter.sh -o install_imposter.sh
+        chmod +x install_imposter.sh
+        ./install_imposter.sh 

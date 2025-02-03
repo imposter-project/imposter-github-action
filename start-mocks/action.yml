@@ -1,0 +1,34 @@
+name: 'Start Imposter Mocks'
+description: 'Starts the Imposter mock server in the background'
+
+inputs:
+  port:
+    description: 'Port number for the Imposter server'
+    required: false
+    default: '8080'
+  config-dir:
+    description: 'Path to the configuration directory'
+    required: false
+    default: './mocks'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Start Imposter server
+      shell: bash
+      run: |
+        imposter up -p ${{ inputs.port }} "${{ inputs.config-dir }}" &
+        
+        # Wait for server to be ready
+        max_attempts=30
+        attempt=1
+        until curl -s -o /dev/null -w "%{http_code}" "http://localhost:${{ inputs.port }}/system/status" | grep -q "200"; do
+          if [ $attempt -ge $max_attempts ]; then
+            echo "Timeout waiting for Imposter server to start"
+            exit 1
+          fi
+          echo "Waiting for Imposter server to start (attempt $attempt/$max_attempts)..."
+          sleep 1
+          attempt=$((attempt + 1))
+        done
+        echo "Imposter server is ready" 

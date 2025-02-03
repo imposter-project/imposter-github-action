@@ -1,0 +1,9 @@
+name: 'Stop Imposter Mocks'
+description: 'Stops the running Imposter mock server'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Stop Imposter server
+      shell: bash
+      run: imposter down 
