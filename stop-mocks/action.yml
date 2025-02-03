@@ -1,9 +1,15 @@
 name: 'Stop Imposter Mocks'
 description: 'Stops the running Imposter mock server'
 
+inputs:
+  engine-type:
+    description: 'Type of mock engine to use (jvm or docker)'
+    required: false
+    default: 'docker'
+
 runs:
   using: "composite"
   steps:
     - name: Stop Imposter server
       shell: bash
-      run: imposter down 
+      run: imposter down -t ${{ inputs.engine-type }} 

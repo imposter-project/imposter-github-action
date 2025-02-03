@@ -18,6 +18,14 @@ inputs:
     description: 'Interval in seconds between retry attempts'
     required: false
     default: '1'
+  version:
+    description: 'Version of the Imposter mock engine to use'
+    required: false
+    default: ''
+  engine-type:
+    description: 'Type of mock engine to use (jvm or docker)'
+    required: false
+    default: 'docker'
 
 runs:
   using: "composite"
@@ -25,7 +33,15 @@ runs:
     - name: Start Imposter server
       shell: bash
       run: |
-        imposter up -p ${{ inputs.port }} "${{ inputs.config-dir }}" &
+        # Build command with optional version and engine type
+        cmd="imposter up -p ${{ inputs.port }} -t ${{ inputs.engine-type }}"
+        if [ ! -z "${{ inputs.version }}" ]; then
+          cmd="$cmd -v ${{ inputs.version }}"
+        fi
+        cmd="$cmd \"${{ inputs.config-dir }}\""
+        
+        # Start the server
+        eval "$cmd" &
         
         # Wait for server to be ready
         max_attempts=${{ inputs.max-attempts }}
