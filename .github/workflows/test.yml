@@ -32,13 +32,13 @@ jobs:
       run: |
         mkdir -p mocks
         cat > mocks/imposter-config.yaml << EOF
-          plugin: rest
-          resources:
-          - path: /test
-            response:
-              statusCode: 200
-              content: Hello from Imposter
-          EOF
+        plugin: rest
+        resources:
+        - path: /test
+          response:
+            statusCode: 200
+            content: Hello from Imposter
+        EOF
     
     # Start mock server
     - name: Test Start Mocks Action
