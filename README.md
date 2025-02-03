@@ -4,6 +4,9 @@ This repository contains official GitHub Actions for [Imposter](https://www.impo
 
 ## Available Actions
 
+> [!NOTE]
+> Replace `v1` in the examples below with the [latest release](https://github.com/imposter-project/imposter-github-action/tags).
+
 ### 1. Setup Imposter (`setup`)
 Downloads and installs the Imposter mock server.
 
