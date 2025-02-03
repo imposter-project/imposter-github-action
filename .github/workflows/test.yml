@@ -70,7 +70,7 @@ jobs:
 
     - name: Verify Server Stopped
       run: |
-        if curl -s http://localhost:8080/test; then
+        if curl -s "${{ steps.start-mocks.outputs.base-url }}/test"; then
           echo "Mock server is still running"
           exit 1
         fi 
