@@ -18,6 +18,10 @@ inputs:
     description: 'Type of mock engine to use (jvm or docker)'
     required: false
     default: 'docker'
+  recursive-config-scan:
+    description: 'Whether to recursively scan the config directory for mock configurations'
+    required: false
+    default: 'false'
   max-attempts:
     description: 'Maximum number of attempts to check if the server is ready'
     required: false
@@ -49,7 +53,7 @@ runs:
         if [ ! -z "${{ inputs.version }}" ]; then
           cmd="$cmd -v ${{ inputs.version }}"
         fi
-        cmd="$cmd \"${{ inputs.config-dir }}\""
+        cmd="$cmd --recursive-config-scan=${{ inputs.config-scan-recursive }} \"${{ inputs.config-dir }}\""
         
         # Start the server
         eval "$cmd" &

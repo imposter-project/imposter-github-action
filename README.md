@@ -25,6 +25,8 @@ Starts the Imposter mock server in the background, and waits for it to be ready.
     version: '1.2.3'           # default: '' (latest)
     # Optional: Type of mock engine to use (jvm or docker)
     engine-type: 'docker'      # default: 'docker'
+    # Optional: Whether to recursively scan the config directory
+    recursive-config-scan: 'false'  # default: 'false'
 ```
 
 <details>
@@ -73,10 +75,11 @@ jobs:
     - name: Start Mocks
       uses: imposter-project/imposter-github-action/start-mocks@v1
       with:
-        port: '8080'
         config-dir: './mocks'
-        engine-type: 'docker'
+        port: '8080'            # Optional: specify port number
+        engine-type: 'docker'   # Optional: specify engine type
         version: '1.2.3'        # Optional: specify engine version
+        recursive-config-scan: 'true'  # Optional: scan config directory recursively
     
     # Your test steps here
     - name: Run Tests
