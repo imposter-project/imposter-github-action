@@ -10,28 +10,28 @@ jobs:
   test-setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
       
-      - name: Test Setup Action
-        uses: ./setup
-        
-      - name: Verify Imposter Installation
-        run: |
-          imposter --version
+    - name: Test Setup Action
+      uses: ./setup
+      
+    - name: Verify Imposter Installation
+      run: |
+        imposter --version
 
   test-mock-lifecycle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
       
-      - name: Setup Imposter
-        uses: ./setup
-        
-      # Create a test mock configuration
-      - name: Create Test Mock Config
-        run: |
-          mkdir -p mocks
-          cat > mocks/imposter-config.yaml << EOF
+    - name: Setup Imposter
+      uses: ./setup
+
+    # Create a test mock configuration
+    - name: Create Test Mock Config
+      run: |
+        mkdir -p mocks
+        cat > mocks/imposter-config.yaml << EOF
           plugin: rest
           resources:
           - path: /test
@@ -39,27 +39,38 @@ jobs:
               statusCode: 200
               content: Hello from Imposter
           EOF
-      
-      - name: Test Start Mocks Action
-        uses: ./start-mocks
-        
-      - name: Verify Mock Server
-        run: |
-          # Wait for server to start
-          sleep 5
-          # Test the mock endpoint
-          response=$(curl -s http://localhost:8080/test)
-          if [ "$response" != "Hello from Imposter" ]; then
-            echo "Mock server test failed"
-            exit 1
-          fi
-      
-      - name: Test Stop Mocks Action
-        uses: ./stop-mocks
-        
-      - name: Verify Server Stopped
-        run: |
-          if curl -s http://localhost:8080/test; then
-            echo "Mock server is still running"
-            exit 1
-          fi 
+    
+    # Start mock server
+    - name: Test Start Mocks Action
+      id: start-mocks
+      uses: ./start-mocks
+      with:
+        port: '8080'
+        config-dir: './mocks'
+    
+    # Assert base URL is accessible
+    - name: Assert Base URL
+      run: |
+        echo "Asserting mock server is accessible at ${{ steps.start-mocks.outputs.base-url }}"
+        response_code=$(curl -s -o /dev/null -w "%{http_code}" "${{ steps.start-mocks.outputs.base-url }}/test")
+        if [ "$response_code" != "200" ]; then
+          echo "Error: Expected status code 200 but got $response_code"
+          exit 1
+        fi
+        response_body=$(curl -s "${{ steps.start-mocks.outputs.base-url }}/test")
+        if [ "$response_body" != "Hello from Imposter" ]; then
+          echo "Error: Expected 'Hello from Imposter' but got '$response_body'"
+          exit 1
+        fi
+        echo "Mock server base URL assertion passed"
+    
+    # Stop mock server
+    - name: Test Stop Mocks Action
+      uses: ./stop-mocks 
+
+    - name: Verify Server Stopped
+      run: |
+        if curl -s http://localhost:8080/test; then
+          echo "Mock server is still running"
+          exit 1
+        fi 

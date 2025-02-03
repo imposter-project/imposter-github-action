@@ -35,6 +35,11 @@ inputs:
     required: false
     default: '1'
 
+outputs:
+  base-url:
+    description: 'Base URL of the mock server'
+    value: http://localhost:${{ inputs.port }}
+
 runs:
   using: "composite"
   steps:

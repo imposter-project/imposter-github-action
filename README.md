@@ -38,6 +38,9 @@ Starts the Imposter mock server in the background, and waits for it to be ready.
 
 </details>
 
+#### Outputs
+- `base-url`: Base URL of the mock server (e.g. `http://localhost:8080`)
+
 ### 3. Stop Mocks (`stop-mocks`)
 Stops the running Imposter mock server.
 
@@ -74,6 +77,7 @@ jobs:
     
     # Start mock server
     - name: Start Mocks
+      id: start-mocks
       uses: imposter-project/imposter-github-action/start-mocks@v1
       with:
         config-dir: './mocks'
@@ -85,8 +89,8 @@ jobs:
     # Your test steps here
     - name: Run Tests
       run: |
-        # Add your test commands here
-        echo "Running tests against mock server..."
+        # The mock server is available at ${{ steps.start-mocks.outputs.base-url }}
+        echo "Running tests against mock server at ${{ steps.start-mocks.outputs.base-url }}"
     
     # Stop mock server
     - name: Stop Mocks
