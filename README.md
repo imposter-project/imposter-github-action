@@ -32,6 +32,7 @@ Starts the Imposter mock server in the background, and waits for it to be ready.
 <details>
 <summary>Advanced configuration options</summary>
 
+- `auto-restart`: Whether to automatically restart when configuration changes (default: false)
 - `max-attempts`: Maximum number of attempts to check if the server is ready (default: 30)
 - `retry-interval`: Interval in seconds between retry attempts (default: 1)
 

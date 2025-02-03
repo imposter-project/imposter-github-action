@@ -22,6 +22,10 @@ inputs:
     description: 'Whether to recursively scan the config directory for mock configurations'
     required: false
     default: 'false'
+  auto-restart:
+    description: 'Whether to automatically restart the mock server when configuration changes'
+    required: false
+    default: 'false'
   max-attempts:
     description: 'Maximum number of attempts to check if the server is ready'
     required: false
@@ -53,7 +57,7 @@ runs:
         if [ ! -z "${{ inputs.version }}" ]; then
           cmd="$cmd -v ${{ inputs.version }}"
         fi
-        cmd="$cmd --recursive-config-scan=${{ inputs.config-scan-recursive }} \"${{ inputs.config-dir }}\""
+        cmd="$cmd --recursive-config-scan=${{ inputs.recursive-config-scan }} --auto-restart=${{ inputs.auto-restart }} \"${{ inputs.config-dir }}\""
         
         # Start the server
         eval "$cmd" &
