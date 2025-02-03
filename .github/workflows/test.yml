@@ -18,7 +18,6 @@ jobs:
       - name: Verify Imposter Installation
         run: |
           imposter --version
-          # Add more verification steps as needed
 
   test-mock-lifecycle:
     runs-on: ubuntu-latest
@@ -32,19 +31,13 @@ jobs:
       - name: Create Test Mock Config
         run: |
           mkdir -p mocks
-          cat > mocks/config.json << EOF
-          {
-            "plugin": "rest",
-            "resources": [
-              {
-                "path": "/test",
-                "response": {
-                  "statusCode": 200,
-                  "content": "Hello from Imposter"
-                }
-              }
-            ]
-          }
+          cat > mocks/imposter-config.yaml << EOF
+          plugin: rest
+          resources:
+          - path: /test
+            response:
+              statusCode: 200
+              content: Hello from Imposter
           EOF
       
       - name: Test Start Mocks Action
