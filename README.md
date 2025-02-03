@@ -17,17 +17,32 @@ Starts the Imposter mock server in the background.
 ```yaml
 - uses: imposter-project/imposter-github-action/start-mocks@v1
   with:
-    # Optional: Port number for the Imposter server (default: 8080)
-    port: '8080'
-    # Optional: Path to the configuration directory (default: ./mocks)
-    config-dir: './mocks'
+    # Optional: Port number for the Imposter server
+    port: '8080'                # default: '8080'
+    # Optional: Path to the configuration directory
+    config-dir: './mocks'       # default: './mocks'
+    # Optional: Version of the Imposter mock engine to use
+    version: '1.2.3'           # default: '' (latest)
+    # Optional: Type of mock engine to use (jvm or docker)
+    engine-type: 'docker'      # default: 'docker'
 ```
+
+<details>
+<summary>Advanced configuration options</summary>
+
+- `max-attempts`: Maximum number of attempts to check if the server is ready (default: 30)
+- `retry-interval`: Interval in seconds between retry attempts (default: 1)
+
+</details>
 
 ### 3. Stop Mocks (`stop-mocks`)
 Stops the running Imposter mock server.
 
 ```yaml
 - uses: imposter-project/imposter-github-action/stop-mocks@v1
+  with:
+    # Optional: Type of mock engine to use (jvm or docker)
+    engine-type: 'docker'      # default: 'docker'
 ```
 
 ## Sample Workflow
@@ -60,6 +75,10 @@ jobs:
       with:
         port: '8080'
         config-dir: './mocks'
+        engine-type: 'docker'
+        version: '1.2.3'        # Optional: specify engine version
+        max-attempts: '30'      # Optional: configure startup retry behaviour
+        retry-interval: '1'     # Optional: configure startup retry behaviour
     
     # Your test steps here
     - name: Run Tests
@@ -70,6 +89,8 @@ jobs:
     # Stop mock server
     - name: Stop Mocks
       uses: imposter-project/imposter-github-action/stop-mocks@v1
+      with:
+        engine-type: 'docker'   # Should match the engine-type used in start-mocks
 ```
 
 ## Configuration
