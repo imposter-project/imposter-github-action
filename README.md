@@ -3,7 +3,7 @@
 This repository contains official GitHub Actions for [Imposter](https://www.imposter.sh), a modern mock server designed for microservice development and testing. These actions allow you to seamlessly integrate Imposter into your GitHub Actions workflows.
 
 > [!NOTE]
-> Replace `v1` in the examples below with the [latest release](https://github.com/imposter-project/imposter-github-action/tags).
+> Replace `v1` in the examples below with the [latest release](https://github.com/imposter-project/imposter-github-action/releases).
 
 ## Available Actions
 
