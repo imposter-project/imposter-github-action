@@ -1,0 +1,77 @@
+name: Test Config File
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-config:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      
+    - name: Setup Imposter
+      uses: ./setup
+
+    # Create test configuration files
+    - name: Create Test Configurations
+      run: |
+        mkdir -p mocks
+        
+        # Create .imposter.yaml config file
+        cat > mocks/.imposter.yaml << EOF
+        version: "4.5.4"
+        EOF
+        
+        # Create mock configuration
+        cat > mocks/imposter-config.yaml << EOF
+        plugin: rest
+        resources:
+        - path: /test
+          response:
+            statusCode: 200
+            content: Hello from Imposter
+        EOF
+    
+    # Start mock server
+    - name: Start Mocks
+      id: start-mocks
+      uses: ./start-mocks
+      with:
+        port: '8080'
+        config-dir: './mocks'
+    
+    # Assert server status and version
+    - name: Assert Server Status
+      run: |
+        echo "Checking server status at ${{ steps.start-mocks.outputs.base-url }}/system/status"
+        response=$(curl -s "${{ steps.start-mocks.outputs.base-url }}/system/status")
+        status=$(echo "$response" | jq -r '.status')
+        version=$(echo "$response" | jq -r '.version')
+        
+        if [ "$status" != "ok" ]; then
+          echo "Error: Expected status 'ok' but got '$status'"
+          exit 1
+        fi
+        
+        if [ "$version" != "4.5.4" ]; then
+          echo "Error: Expected version '4.5.4' but got '$version'"
+          echo "Full response: $response"
+          exit 1
+        fi
+        
+        echo "Server status check passed - running version $version"
+    
+    # Stop mock server
+    - name: Stop Mocks
+      uses: ./stop-mocks
+      
+    # Verify server stopped
+    - name: Verify Server Stopped
+      run: |
+        if curl -s "${{ steps.start-mocks.outputs.base-url }}/system/status"; then
+          echo "Mock server is still running"
+          exit 1
+        fi 
