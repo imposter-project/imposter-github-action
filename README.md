@@ -2,10 +2,10 @@
 
 This repository contains official GitHub Actions for [Imposter](https://www.imposter.sh), a modern mock server designed for microservice development and testing. These actions allow you to seamlessly integrate Imposter into your GitHub Actions workflows.
 
-## Available Actions
-
 > [!NOTE]
 > Replace `v1` in the examples below with the [latest release](https://github.com/imposter-project/imposter-github-action/tags).
+
+## Available Actions
 
 ### 1. Setup Imposter (`setup`)
 Downloads and installs the Imposter mock server.
@@ -31,6 +31,9 @@ Starts the Imposter mock server in the background, and waits for it to be ready.
     # Optional: Whether to recursively scan the config directory
     recursive-config-scan: 'false'  # default: 'false'
 ```
+
+> [!NOTE]
+> For `version`, choose from the Imposter [releases](https://github.com/outofcoffee/imposter/releases) page.
 
 <details>
 <summary>Advanced configuration options</summary>
