@@ -1,0 +1,39 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  test-lifecycle:
+    uses: ./.github/workflows/test-lifecycle.yml
+  
+  test-config:
+    uses: ./.github/workflows/test-config.yml
+
+  release:
+    needs: [test-lifecycle, test-config]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Changelog Entries
+        uses: release-tools/since@707ab359a9d7f14e5d19126ec19e3fe218b8cbcc
+        with:
+          output-file: version_changelog.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: version_changelog.txt
+          draft: false
+          prerelease: false

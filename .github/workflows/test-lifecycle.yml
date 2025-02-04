@@ -1,10 +1,7 @@
-name: Test Actions
+name: Test Lifecycle
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_call:
 
 jobs:
   test-setup:
@@ -66,7 +63,7 @@ jobs:
     
     # Stop mock server
     - name: Test Stop Mocks Action
-      uses: ./stop-mocks 
+      uses: ./stop-mocks
 
     - name: Verify Server Stopped
       run: |

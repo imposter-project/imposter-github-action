@@ -1,4 +1,4 @@
-# Imposter GitHub Actions [![Test Actions](https://github.com/imposter-project/imposter-github-action/actions/workflows/test.yml/badge.svg)](https://github.com/imposter-project/imposter-github-action/actions/workflows/test.yml)
+# Imposter GitHub Actions [![CI/CD](https://github.com/imposter-project/imposter-github-action/actions/workflows/ci.yml/badge.svg)](https://github.com/imposter-project/imposter-github-action/actions/workflows/ci.yml)
 
 This repository contains official GitHub Actions for [Imposter](https://www.imposter.sh), a modern mock server designed for microservice development and testing. These actions allow you to seamlessly integrate Imposter into your GitHub Actions workflows.
 
