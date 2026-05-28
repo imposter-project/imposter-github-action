@@ -1,7 +1,15 @@
 name: 'Stop Imposter Mocks'
-description: 'Stops all running Imposter mock servers'
+description: 'Stops a specific Imposter mock by ID, or all running mocks'
 
 inputs:
+  mock-id:
+    description: 'Optional ID of a specific mock to stop. If omitted (and mock-id-file is unset), all managed mocks are stopped.'
+    required: false
+    default: ''
+  mock-id-file:
+    description: 'Optional path to a file containing the ID of the mock to stop, as written by the start-mocks mock-id-file input.'
+    required: false
+    default: ''
   engine-type:
     description: 'Deprecated and ignored. All managed mocks are stopped regardless of engine type.'
     required: false
@@ -17,4 +25,18 @@ runs:
 
     - name: Stop Imposter server
       shell: bash
-      run: imposter down --all
+      env:
+        MOCK_ID: ${{ inputs.mock-id }}
+        MOCK_ID_FILE: ${{ inputs.mock-id-file }}
+      run: |
+        if [ -n "$MOCK_ID" ] && [ -n "$MOCK_ID_FILE" ]; then
+          echo "::error title=Conflicting inputs::Specify only one of 'mock-id' or 'mock-id-file', not both."
+          exit 1
+        fi
+        if [ -n "$MOCK_ID" ]; then
+          imposter down "$MOCK_ID"
+        elif [ -n "$MOCK_ID_FILE" ]; then
+          imposter down --id-file "$MOCK_ID_FILE"
+        else
+          imposter down --all
+        fi
