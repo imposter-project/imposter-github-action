@@ -12,4 +12,4 @@ runs:
   steps:
     - name: Stop Imposter server
       shell: bash
-      run: imposter down -t ${{ inputs.engine-type }} 
+      run: imposter down ${{ inputs.engine-type }} 
