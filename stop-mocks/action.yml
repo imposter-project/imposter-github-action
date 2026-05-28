@@ -1,15 +1,20 @@
 name: 'Stop Imposter Mocks'
-description: 'Stops the running Imposter mock server'
+description: 'Stops all running Imposter mock servers'
 
 inputs:
   engine-type:
-    description: 'Type of mock engine to use (jvm or docker)'
+    description: 'Deprecated and ignored. All managed mocks are stopped regardless of engine type.'
     required: false
-    default: 'docker'
+    deprecationMessage: "The 'engine-type' input is deprecated and no longer used; all managed mocks are stopped regardless of engine type."
 
 runs:
   using: "composite"
   steps:
+    - name: Warn on deprecated engine-type input
+      if: ${{ inputs.engine-type != '' }}
+      shell: bash
+      run: echo "::warning title=Deprecated input::The 'engine-type' input of stop-mocks is deprecated and no longer used; all managed mocks are stopped regardless of engine type."
+
     - name: Stop Imposter server
       shell: bash
-      run: imposter down ${{ inputs.engine-type }} 
+      run: imposter down --all
