@@ -48,14 +48,14 @@ Starts the Imposter mock server in the background, and waits for it to be ready.
 - `base-url`: Base URL of the mock server (e.g. `http://localhost:8080`)
 
 ### 3. Stop Mocks (`stop-mocks`)
-Stops the running Imposter mock server.
+Stops all running Imposter mock servers, regardless of engine type.
 
 ```yaml
 - uses: imposter-project/imposter-github-action/stop-mocks@v1
-  with:
-    # Optional: Type of mock engine to use (jvm or docker)
-    engine-type: 'docker'      # default: 'docker'
 ```
+
+> [!NOTE]
+> The `engine-type` input is deprecated and ignored; all managed mocks are stopped regardless of engine type.
 
 ## Sample Workflow
 
@@ -101,8 +101,6 @@ jobs:
     # Stop mock server
     - name: Stop Mocks
       uses: imposter-project/imposter-github-action/stop-mocks@v1
-      with:
-        engine-type: 'docker'   # Should match the engine-type used in start-mocks
 ```
 
 ## Configuration
