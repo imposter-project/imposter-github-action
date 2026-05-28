@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.1.0] - 2025-05-28
+### Fixed
+- fix: removes the -t argument from imposter down
+- fix: stop all mocks in stop-mocks and deprecate engine-type
+
+## [1.0.0] - 2025-02-04
+### Changed
+- docs: links to releases page
+
 ## [0.6.1] - 2025-02-04
 ### Changed
 - ci: adds release workflow.
