@@ -1,5 +1,5 @@
 name: 'Start Imposter Mocks'
-description: 'Starts the Imposter mock server in the background'
+description: 'Starts the Imposter mock server in the background and waits for it to be healthy'
 
 inputs:
   config-dir:
@@ -22,18 +22,22 @@ inputs:
     description: 'Whether to recursively scan the config directory for mock configurations'
     required: false
     default: 'false'
+  mock-id-file:
+    description: 'Optional path to a file where the started mock ID will be written, for later use with the stop-mocks mock-id-file input.'
+    required: false
+    default: ''
   auto-restart:
-    description: 'Whether to automatically restart the mock server when configuration changes'
+    description: 'Deprecated and ignored. The mock now runs detached, which is incompatible with auto-restart.'
     required: false
-    default: 'false'
+    deprecationMessage: "The 'auto-restart' input is deprecated and no longer used; the mock now runs detached, which is incompatible with auto-restart."
   max-attempts:
-    description: 'Maximum number of attempts to check if the server is ready'
+    description: 'Deprecated and ignored. The CLI now waits for the healthcheck before returning (--detach=healthy).'
     required: false
-    default: '30'
+    deprecationMessage: "The 'max-attempts' input is deprecated and no longer used; the CLI now waits for the healthcheck before returning."
   retry-interval:
-    description: 'Interval in seconds between retry attempts'
+    description: 'Deprecated and ignored. The CLI now waits for the healthcheck before returning (--detach=healthy).'
     required: false
-    default: '1'
+    deprecationMessage: "The 'retry-interval' input is deprecated and no longer used; the CLI now waits for the healthcheck before returning."
 
 outputs:
   base-url:
@@ -43,41 +47,44 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Warn on deprecated inputs
+      if: ${{ inputs.auto-restart != '' || inputs.max-attempts != '' || inputs.retry-interval != '' }}
+      shell: bash
+      run: echo "::warning title=Deprecated input::The 'auto-restart', 'max-attempts' and 'retry-interval' inputs of start-mocks are deprecated and no longer used; the mock now starts detached and the CLI waits for the healthcheck before returning."
+
     - name: Pull Imposter engine
       shell: bash
+      env:
+        ENGINE_TYPE: ${{ inputs.engine-type }}
+        VERSION: ${{ inputs.version }}
+        CONFIG_DIR: ${{ inputs.config-dir }}
       run: |
-        echo "Pulling ${{ inputs.engine-type }} engine"
-        if [ ! -z "${{ inputs.version }}" ]; then
-          imposter engine pull --engine-type ${{ inputs.engine-type }} --version ${{ inputs.version }} --config "${{ inputs.config-dir }}/.imposter.yaml"
+        echo "Pulling $ENGINE_TYPE engine"
+        if [ -n "$VERSION" ]; then
+          imposter engine pull --engine-type "$ENGINE_TYPE" --version "$VERSION" --config "$CONFIG_DIR/.imposter.yaml"
         else
-          imposter engine pull --engine-type ${{ inputs.engine-type }} --config "${{ inputs.config-dir }}/.imposter.yaml"
+          imposter engine pull --engine-type "$ENGINE_TYPE" --config "$CONFIG_DIR/.imposter.yaml"
         fi
 
     - name: Start Imposter server
       shell: bash
+      env:
+        PORT: ${{ inputs.port }}
+        ENGINE_TYPE: ${{ inputs.engine-type }}
+        VERSION: ${{ inputs.version }}
+        CONFIG_DIR: ${{ inputs.config-dir }}
+        RECURSIVE_CONFIG_SCAN: ${{ inputs.recursive-config-scan }}
+        MOCK_ID_FILE: ${{ inputs.mock-id-file }}
       run: |
-        # Build command with optional version and engine type
-        cmd="imposter up --port ${{ inputs.port }} --engine-type ${{ inputs.engine-type }}"
-        if [ ! -z "${{ inputs.version }}" ]; then
-          cmd="$cmd --version ${{ inputs.version }}"
+        # Start the mock detached; --detach=healthy returns once the healthcheck passes.
+        args=(up --port "$PORT" --engine-type "$ENGINE_TYPE" --detach=healthy --recursive-config-scan="$RECURSIVE_CONFIG_SCAN")
+        if [ -n "$VERSION" ]; then
+          args+=(--version "$VERSION")
         fi
-        cmd="$cmd --recursive-config-scan=${{ inputs.recursive-config-scan }} --auto-restart=${{ inputs.auto-restart }} --config \"${{ inputs.config-dir }}/.imposter.yaml\" \"${{ inputs.config-dir }}\""
-        
-        # Start the server
-        eval "$cmd" &
-        
-        # Wait for server to be ready
-        max_attempts=${{ inputs.max-attempts }}
-        attempt=1
-        health_check_url="http://localhost:${{ inputs.port }}/system/status"
-        echo "Waiting for Imposter server to start at: $health_check_url"
-        until curl -s -o /dev/null -w "%{http_code}" "$health_check_url" | grep -q "200"; do
-          if [ $attempt -ge $max_attempts ]; then
-            echo "Timeout waiting for Imposter server to start"
-            exit 1
-          fi
-          echo "Waiting for Imposter server to start (attempt $attempt/$max_attempts)..."
-          sleep ${{ inputs.retry-interval }}
-          attempt=$((attempt + 1))
-        done
-        echo "Imposter server is ready" 
+        if [ -n "$MOCK_ID_FILE" ]; then
+          args+=(--id-file "$MOCK_ID_FILE")
+        fi
+        args+=(--config "$CONFIG_DIR/.imposter.yaml" "$CONFIG_DIR")
+
+        imposter "${args[@]}"
+        echo "Imposter server is ready at http://localhost:$PORT"
